@@ -153,7 +153,7 @@
 			endDate: this._o.endDate,
 			daysOfWeekDisabled: this.o.daysOfWeekDisabled,
 			daysOfWeekHighlighted: this.o.daysOfWeekHighlighted,
-			datesDisabled: this.o.datesDisabled
+			datesEnabled: this.o.datesEnabled
 		});
 
 		this._allow_update = false;
@@ -271,11 +271,11 @@
 			o.daysOfWeekDisabled = this._resolveDaysOfWeek(o.daysOfWeekDisabled||[]);
 			o.daysOfWeekHighlighted = this._resolveDaysOfWeek(o.daysOfWeekHighlighted||[]);
 
-			o.datesDisabled = o.datesDisabled||[];
-			if (!$.isArray(o.datesDisabled)) {
-				o.datesDisabled = o.datesDisabled.split(',');
+			o.datesEnabled = o.datesEnabled||[];
+			if (!$.isArray(o.datesEnabled)) {
+				o.datesEnabled = o.datesEnabled.split(',');
 			}
-			o.datesDisabled = $.map(o.datesDisabled, function(d){
+			o.datesEnabled = $.map(o.datesEnabled, function(d){
 				return DPGlobal.parseDate(d, format, o.language, o.assumeNearbyYear);
 			});
 
@@ -657,8 +657,8 @@
 			return this;
 		},
 
-		setDatesDisabled: function(datesDisabled){
-			this._process_options({datesDisabled: datesDisabled});
+		setDatesEnabled: function(datesEnabled){
+			this._process_options({datesEnabled: datesEnabled});
 			this.update();
 			return this;
 		},
@@ -883,8 +883,10 @@
 			if (!this.dateWithinRange(date)){
 				cls.push('disabled');
 			}
-			if (this.dateIsDisabled(date)){
+			if (!this.dateIsEnabled(date)){
 				cls.push('disabled', 'disabled-date');
+			} else {
+				cls.push('highlighted');
 			}
 			if ($.inArray(date.getUTCDay(), this.o.daysOfWeekHighlighted) !== -1){
 				cls.push('highlighted');
@@ -1378,7 +1380,7 @@
 
 				fn = 'moveDay';
 			}
-			while (this.dateIsDisabled(date));
+			while (!this.dateIsEnabled(date));
 
 			return date;
 		},
@@ -1387,10 +1389,10 @@
 			return $.inArray(date.getUTCDay(), this.o.daysOfWeekDisabled) !== -1;
 		},
 
-		dateIsDisabled: function(date){
+		dateIsEnabled: function(date){
 			return (
 				this.weekOfDateIsDisabled(date) ||
-				$.grep(this.o.datesDisabled, function(d){
+				$.grep(this.o.datesEnabled, function(d){
 					return isUTCEquals(date, d);
 				}).length > 0
 			);
@@ -1690,7 +1692,7 @@
 		toggleActive: false,
 		daysOfWeekDisabled: [],
 		daysOfWeekHighlighted: [],
-		datesDisabled: [],
+		datesEnabled: [],
 		endDate: Infinity,
 		forceParse: true,
 		format: 'mm/dd/yyyy',
